@@ -42,22 +42,28 @@
      </form>
 
 
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script type="text/javascript">
+     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+     <script type="text/javascript">
+    
     (document).ready(function (){
+        // append git buttons
 
+    var topic = ["80s movies", "80s horror", "80s comedy", "80s classic", "80s hair", "80s toys", "80s babes", "80s cars", "80s clothes", "Just 80s"]
+    
     function displayGifButtons() {
         $("#gifs-appear-here").empty();
         for (var i = 0; i < topic.length; i++) {
             var gifButton = $("<button>");
-            gifButton.addClass("80s");
-            gifButton.addClass("btn btn-primary")
-            gifButton.attr("data-name", topic[i]);
+            gifButton.addClass("topic-btn");
+            gifButton.addClass("btn btn-primary");
+            gifButton.attr("data-topic", topic[i].replace(/\s+/g, '+'));
             gifButton.text(topic[i]);
             $("#gifButtonsView").append(gifButton);
+            $("topic-btn").on("click", function (e){
+                displayGifs($(this).attr("data-topic"));
+            });
         }
-
+    // add new buttons
     function addNewButton() {
         $("#addGif").on("click", function () {
             var topic = $("#topicInput").val().trim();
@@ -68,48 +74,47 @@
 
             displayGifButtons();
             return false;
-        });
-
+        });    
+        }
+    // Display Gifs
     function displayGifs() {
         var movie = $(this).attr("data-name");
-        var topic = ["80s movies", "80s horror", "80s comedy", "80s classic", "80s hair", "80s toys", "80s babes", "80s cars", "80s clothes", "Just 80s"]
-        var movie = $(this).attr("data-80smovie");
-        var queryURL = "https://api.giphy.com/v1/gifs/search?" +
-            movie + "&api_key=8E2MeC0HBzb42wPA9MMb4GhvuIr4Lcw1&q=80smovies&limit=10&offset=0&rating=PG-13&lang=en";
+        var movie = $(this).attr("data-topic");
+        var queryURL = "https://api.giphy.com/v1/gifs/search?&api_key=8E2MeC0HBzb42wPA9MMb4GhvuIr4Lcw1&limit=10&offset=0&rating=PG-13&lang=en&tag=" + movie;
         $.ajax({
         url: queryURL,
         method: 'GET'
         })
 
-        .done(function (response) {
-        $("#gifs-appear-here").empty();
-        //show results of gifs
-        var results = response.data;
-        if (results == "") {
-            alert("NO GIF FOR YOU!!!");
-        }
-        for (var i = 0; i < results.length; i++) {
-        //put gifs in a div
-        var gifDiv = $("<div1>");
-        //pull rating of gif
-        var gifRating = $("<p>").text("Rating " + results[i].rating);
-        gifDiv.append(gifRating);
+        .then(function (response) {
+            $("#gifs-appear-here").empty();
+            //show results of gifs
+            var results = response.data;
+            if (results == "") {
+                alert("NO GIF FOR YOU!!!");
+            }
+            for (var i = 0; i < results.length; i++) {
+            //put gifs in a div
+            var gifDiv = $("<div1>");
+            //pull rating of gif
+            var gifRating = $("<p>").text("Rating " + results[i].rating);
+            gifDiv.append(gifRating);
 
-        //pull gif
-        var gifImage = $("<img>");
-        gifImage.attr("src", results[i].images.fixed_height_small_still.url);
-        //paused images
-        gifImage.attr("data-still", results[i].images.fixed_height_small_still.url);
-        //animated images
-        gifImage.attr("data-animate", results[i].images.fixed_height_small.url);
-        //how images come in, already paused
-        gifImage.attr("data-state", "still");
-        gifImage.addClass("image");
-        gifDiv.append(gifImage);
-        //add new div to existing divs
+            //pull gif
+            var gifImage = $("<img>");
+            gifImage.attr("src", results[i].images.fixed_height_small_still.url);
+            //paused images
+            gifImage.attr("data-still", results[i].images.fixed_height_small_still.url);
+            //animated images
+            gifImage.attr("data-animate", results[i].images.fixed_height_small.url);
+            //how images come in, already paused
+            gifImage.attr("data-state", "still");
+            gifImage.addClass("image");
+            gifDiv.append(gifImage);
+            //add new div to existing divs
             $("#gifsView").prepend(gifDiv);
-                }
-        });
+                
+        }});
 
         //event listeners
         $(document).on("click", ".movie", displayGifs);
@@ -117,7 +122,7 @@
             var state = $(this).attr('data-state');
             if (state == 'still') {
                 $(this).attr('src', $(this).data('animate'));
-                $(this).attr('data-state', 'animate');
+                $(this).attr('data-state','animate');
             } else {
                 $(this).attr('src', $(this).data('still'));
                 $(this).attr('data-state', 'still');
@@ -127,8 +132,9 @@
 
         }); 
 
+    };
     </script>
 
-</body>
+   </body>
 
 </html>
